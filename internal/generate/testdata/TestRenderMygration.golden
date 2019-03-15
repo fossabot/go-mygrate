@@ -1,0 +1,14 @@
+package mygrations
+
+import (
+	"errors"
+)
+
+func Mygration_1_init_Up(dep interface{}) error {
+	return errors.New("need to implement")
+}
+
+func Mygration_1_init_Down(dep interface{}) error {
+	return errors.New("need to implement")
+}
+

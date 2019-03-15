@@ -65,6 +65,7 @@ func Mygration_{{ .ID }}_{{ .Name }}_Down(dep interface{}) error {
 `))
 )
 
+// Init will create the mygrationsPath.
 func Init(mygrationsPath string) error {
 	err := ensureDir(mygrationsPath)
 	if err != nil {
@@ -74,12 +75,21 @@ func Init(mygrationsPath string) error {
 	return nil
 }
 
-func GenerateMygration(mygrationsPath string, id int, name string) error {
+func renderMygration(id int, name string) (*bytes.Buffer, error) {
 	buf := new(bytes.Buffer)
 	err := templateMygrationFile.Execute(buf, &tplVarForMygration{
 		ID:   id,
 		Name: name,
 	})
+	if err != nil {
+		return nil, err
+	}
+	return buf, nil
+}
+
+// GenerateMygration generates a migration file with the default template.
+func GenerateMygration(mygrationsPath string, id int, name string) error {
+	buf, err := renderMygration(id, name)
 	if err != nil {
 		return err
 	}
@@ -93,6 +103,8 @@ func GenerateMygration(mygrationsPath string, id int, name string) error {
 	return nil
 }
 
+// GenerateMygrations will walk the mygration folder, generate the mygration.go file
+// and register all migrations.
 func GenerateMygrations(mygrationsPath string) error {
 	mygrationFiles := findMygrationsInDir(mygrationsPath)
 	sort.Strings(mygrationFiles)
