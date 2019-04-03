@@ -13,10 +13,9 @@ Mμgrate is for anyone looking for a simple, small and handy solution to migrate
 - no need to install some outdated or abandoned ORM to migrate your database
 - use the deps and driver that you are already using
 - migrate whatever you want! A migration is just a pair of functions which getting called in order!
-- ships with a json file based store, but you can implement your own Store  
-  (sqlite will come soon)
-- the cli works perfectly with go generate to register automatically new migrations files
-- the cli creates new files for you
+- ships with a json file based store, but you can implement your own Store
+- the cli works with go generate to register automatically new migrations files
+- the cli can create new files for you
 
 ### Installation
 
