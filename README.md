@@ -2,20 +2,20 @@
 
 ## Mμgrate
 
-Mμgrate is a micro (μ) migration framework. It has no external deps, use go stdlib features and is production ready. A mμgration is just a timestamp, a name and a pair of go functions executed in order.
+Mμgrate is a micro (μ) migration framework. It has no external deps, use go stdlib features and is production ready. A mμgration is just a timestamp, a name and a pair of go functions executed in the same order.
 
-Mμgrate is for anyone looking for a simple, small and handy solution to migrate things in your project up and down.
+Mμgrate is for anyone looking for a simple, small and handy solution to migrate things in a project up and/or down.
 
 **Features**
 
 - ship your migrations compiled in your binary
 - migrate programmatically
-- no need to install some outdated or abandoned ORM to migrate your database
-- use the deps and driver that you are already using
-- migrate whatever you want! A migration is just a pair of functions which getting called in order!
-- ships with a json file based store, but you can implement your own Store
-- the cli works with go generate to register automatically new migrations files
-- the cli can create new files for you
+- no deps on some outdated or abandoned ORMs to migrate your database
+- use the deps and driver that you are already using in your project
+- migrate whatever you want! A migration is just a pair of functions which getting called in same order!
+- ships with a FileStore (json based) and a SQLStore - but it's easy to implement your own custom store
+- mygrate supports go´s generate to register new migrations files automatically
+- the cli can create new mygration files for you
 
 ### Installation
 
@@ -24,22 +24,22 @@ Mμgrate is for anyone looking for a simple, small and handy solution to migrate
 This will install the mygrate command
 
 ```bash
-go get github.com/stahlstift/go-migrate/cmd/mygrate
+go get github.com/demaggus83/go-mygrate/cmd/mygrate
 ```
 
 #### GO
 
-Add mygrate as a dep to your project
+Add mygrate as a dependency to your project
 
 ```bash
-go get github.com/stahlstift/go-migrate
+go get github.com/demaggus83/go-mygrate
 ```
 
 For a complete example see the example folder
 
 ```go
 
-//go:generate mygrate generate
+//go:generate go run mygrations/generate.go
 
 func migrate() error {
 	myg, err := mygrate.New(&mygrations.Deps{})
@@ -63,3 +63,17 @@ func migrate() error {
 ```bash
 mygrate create name_your_migration
 ```
+
+### Changelog
+
+#### 0.2.0
++ some cleanups and refactorings
++ added SQLStore
++ mygrate will now use the mygration.tpl   
+	this allows to modify the template of a new migration which can be usefully for typecasting the dep to a specific factory or struct   
+	If the file is not present mygration will generate a default mygration.tpl
++ mygrate will create now a mygrations/generate/mygrations.go file to be used with go:generate   
+	this removes the requirement to install the cli tool to generate the mygrations.go file. (e.G. CI builds)
+
+#### 0.1.0
++ init

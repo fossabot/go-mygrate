@@ -21,12 +21,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stahlstift/go-mygrate/internal/generate"
+	"github.com/demaggus83/go-mygrate/internal/generate"
+	"github.com/demaggus83/go-mygrate/pkg/mygrate"
 )
 
 const (
-	mygrationsPath = "./mygrations"
-	nameRegex      = `^[a-zA-Z]\w+[a-zA-Z0-9]$`
+	nameRegex = `^[a-zA-Z]\w+[a-zA-Z0-9]$`
 )
 
 var validName = regexp.MustCompile(nameRegex)
@@ -35,7 +35,7 @@ const usage = `Usage:
 %s [command]
 Commands:
 	create name	creates a new migration
-	generate	generates the mygrations.go
+	init		init the mygration folder
 	version		shows the current version
 `
 
@@ -45,7 +45,7 @@ Positional Arguments:
 	name		the name for the migration
 `
 
-const version = "0.1.0"
+const version = "0.2.0"
 
 func must(err error) {
 	if err != nil {
@@ -72,13 +72,13 @@ func main() {
 			fmt.Printf("Given name '%s' in illegal format. Format should be '%s'\n", name, nameRegex)
 			os.Exit(1)
 		}
-		must(generate.Init(mygrationsPath))
-		must(generate.GenerateMygration(mygrationsPath, int(time.Now().Unix()), name))
-		must(generate.GenerateMygrations(mygrationsPath))
+		must(generate.Init(mygrate.MygrationsPath))
+		must(generate.GenerateMygration(mygrate.MygrationsPath, int(time.Now().Unix()), name))
+		must(generate.GenerateMygrations(mygrate.MygrationsPath))
 		return
-	case "generate":
-		must(generate.Init(mygrationsPath))
-		must(generate.GenerateMygrations(mygrationsPath))
+	case "init":
+		must(generate.Init(mygrate.MygrationsPath))
+		must(generate.GenerateMygrations(mygrate.MygrationsPath))
 		return
 	case "version":
 		fmt.Printf(version)

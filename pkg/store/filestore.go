@@ -1,4 +1,4 @@
-package mygrate
+package store
 
 import (
 	"encoding/json"
@@ -12,16 +12,18 @@ type mygration struct {
 	Executed time.Time `json:"executed"`
 }
 
-type fileStore struct {
+type FileStore struct {
 	Current    int                `json:"current"`
 	Mygrations map[int]*mygration `json:"mygrations"`
 }
 
-func (f *fileStore) GetLatest() int {
-	return f.Current
+func NewFileStore() *FileStore {
+	return &FileStore{
+		Mygrations: make(map[int]*mygration),
+	}
 }
 
-func (f *fileStore) Init() error {
+func (f *FileStore) Init() error {
 	buf, err := ioutil.ReadFile(".mygrate")
 	if err != nil {
 		return nil
@@ -35,7 +37,11 @@ func (f *fileStore) Init() error {
 	return nil
 }
 
-func (f *fileStore) LogUp(id int, name string, executed time.Time) error {
+func (f *FileStore) FindLatestID() (int, error) {
+	return f.Current, nil
+}
+
+func (f *FileStore) LogUp(id int, name string, executed time.Time) error {
 	f.Mygrations[id] = &mygration{
 		Name:     name,
 		Executed: executed,
@@ -44,20 +50,20 @@ func (f *fileStore) LogUp(id int, name string, executed time.Time) error {
 	return nil
 }
 
-func (f *fileStore) LogDown(id int, name string, executed time.Time) error {
+func (f *FileStore) LogDown(id int, name string, executed time.Time) error {
 	delete(f.Mygrations, id)
 
 	var keys []int
 	for k := range f.Mygrations {
 		keys = append(keys, k)
 	}
-	sort.Ints(keys)
+	sort.Slice(keys, func(i, j int) bool { return keys[i] < keys[j] })
 
 	f.Current = keys[len(keys)-1]
 	return nil
 }
 
-func (f *fileStore) Save() error {
+func (f *FileStore) Save() error {
 	buf, err := json.MarshalIndent(f, "", "  ")
 	if err != nil {
 		return err

@@ -5,24 +5,26 @@ import (
 	"fmt"
 	"sort"
 	"time"
+
+	"github.com/demaggus83/go-mygrate/internal/generate"
+	"github.com/demaggus83/go-mygrate/pkg/store"
 )
 
-// Store saves the current migration progress.
-type Store interface {
-	// GetLatest returns the last ID from store.
-	GetLatest() int
+const MygrationsPath = "./mygrations"
 
-	// Init should prepare your store (e.g. create tables if not exists, create directory, ...).
-	Init() error
+// Generate is a helper func to be used bye go generate
+func Generate() error {
+	err := generate.Init(MygrationsPath)
+	if err != nil {
+		return err
+	}
 
-	// LogUp will be called after an up migration successfully ran.
-	LogUp(id int, name string, executed time.Time) error
+	err = generate.GenerateMygrations(MygrationsPath)
+	if err != nil {
+		return err
+	}
 
-	// LogDown will be called after a down migration successfully ran.
-	LogDown(id int, name string, executed time.Time) error
-
-	// Save will be called after an Up/Down action fails or after all migrations ran successfully.
-	Save() error
+	return nil
 }
 
 type mygrationFunc = func(deps interface{}) error
@@ -35,33 +37,22 @@ type mygrationsFuncs struct {
 
 type Mygrate struct {
 	mygrations map[int]*mygrationsFuncs
-	Store      Store
+	Store      store.Store
 	dep        interface{}
 }
 
 func New(dep interface{}) (*Mygrate, error) {
-	store := &fileStore{
-		Mygrations: make(map[int]*mygration),
-	}
-	if err := store.Init(); err != nil {
-		return nil, err
-	}
-
-	return &Mygrate{
-		mygrations: make(map[int]*mygrationsFuncs, 0),
-		Store:      store,
-		dep:        dep,
-	}, nil
+	return NewWithStore(dep, store.NewFileStore())
 }
 
-func NewWithStore(dep interface{}, store Store) (*Mygrate, error) {
-	if err := store.Init(); err != nil {
+func NewWithStore(dep interface{}, st store.Store) (*Mygrate, error) {
+	if err := st.Init(); err != nil {
 		return nil, err
 	}
 
 	return &Mygrate{
 		mygrations: make(map[int]*mygrationsFuncs, 0),
-		Store:      store,
+		Store:      st,
 		dep:        dep,
 	}, nil
 }
@@ -143,9 +134,14 @@ func (m *Mygrate) redoLast(keys []int) error {
 func (m *Mygrate) Up(redoLast bool) error {
 	keys := m.getKeysAsc()
 
+	latestID, err := m.Store.FindLatestID()
+	if err != nil {
+		return err
+	}
+
 	changes := 0
 	for _, id := range keys {
-		if id <= m.Store.GetLatest() {
+		if id <= latestID {
 			continue
 		}
 
@@ -164,7 +160,7 @@ func (m *Mygrate) Up(redoLast bool) error {
 		}
 	}
 
-	err := m.Store.Save()
+	err = m.Store.Save()
 	if err != nil {
 		return err
 	}

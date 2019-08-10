@@ -3,20 +3,26 @@ package main
 import (
 	"fmt"
 
-	"github.com/stahlstift/go-mygrate/pkg/mygrate"
-	"github.com/stahlstift/mygrate-test/mygrations"
+	"github.com/demaggus83/go-mygrate/mygrations" // this is the generated file from mygration
+
+	"github.com/demaggus83/go-mygrate/pkg/mygrate"
 )
 
-//go:generate mygrate generate
+//go:generate go run mygrations/generate/mygrations.go
 
 func migrate() error {
-	myg, err := mygrate.New(&mygrations.Deps{})
+	someFactory := "this could be a factory"
+
+	myg, err := mygrate.New(someFactory)
 	if err != nil {
 		return err
 	}
 
+	// Register your migrations with mygration
 	mygrations.Register(myg)
 
+	// Run your migrations
+	// redoLast could be usefully in development
 	err = myg.Up(false)
 	if err != nil {
 		return err
@@ -30,5 +36,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("Hello Migrations!")
 }
