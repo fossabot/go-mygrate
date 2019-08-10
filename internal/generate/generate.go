@@ -71,7 +71,7 @@ package main
 import "github.com/demaggus83/go-mygrate/pkg/mygrate"
 
 // this file should be used in your project with go generate
-// example: //go:generate go run mygration/generate.go
+// example: //go:generate go run mygrations/generate/mygrations.go
 
 func main() {
 	err := mygrate.Generate()
