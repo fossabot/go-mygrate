@@ -66,6 +66,9 @@ mygrate create name_your_migration
 
 ### Changelog
 
+#### 0.2.2
++ fixing some little issues
+
 #### 0.2.0
 + some cleanups and refactorings
 + added SQLStore
