@@ -1,4 +1,6 @@
 # go-mygrate
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdemaggus83%2Fgo-mygrate.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdemaggus83%2Fgo-mygrate?ref=badge_shield)
+
 
 ## Mμgrate
 
@@ -80,3 +82,7 @@ mygrate create name_your_migration
 
 #### 0.1.0
 + init
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdemaggus83%2Fgo-mygrate.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdemaggus83%2Fgo-mygrate?ref=badge_large)
